@@ -1,12 +1,17 @@
 import { lazy, Suspense } from "react";
 import { Loader } from "./components/pixiapp";
 import PixiCanvas from "./components/pixiCanvas";
+import { SocketContextProvider } from "./context/socketContext";
 // import PixiNewApp from "./components/pixiNewApp";
 
 // const PixiCanvas = lazy(() => import("./components/pixiCanvas"));
 
 function App() {
-  return <PixiCanvas />;
+  return (
+    <SocketContextProvider>
+      <PixiCanvas />
+    </SocketContextProvider>
+  );
 }
 
 // function Loader() {
