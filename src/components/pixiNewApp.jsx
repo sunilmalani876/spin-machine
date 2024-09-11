@@ -1,17 +1,19 @@
-import * as PIXI from "pixi.js";
+// import * as PIXI from "pixi.js";
 import React, { useEffect, useRef } from "react";
 import { useSocketContext } from "../context/socketContext";
 import ring1 from "../assets/ring/ring1.png";
 import ring2 from "../assets/ring/ring2.png";
 import ring3 from "../assets/ring/ring3.png";
+import bgCover from "../assets/bgCover.png";
 import ringButton from "../assets/ring/ringButton.png";
 import gsap from "gsap";
+import { Application, Assets, Container, Sprite, Text } from "pixi.js";
 
 const headingX = 165;
 
 // Helper functions
 const createText = (text, style, x, y, anchor = 0.5) => {
-  const textObj = new PIXI.Text(text, style);
+  const textObj = new Text(text, style);
   textObj.x = x;
   textObj.y = y;
   textObj.anchor.set(anchor);
@@ -19,7 +21,7 @@ const createText = (text, style, x, y, anchor = 0.5) => {
 };
 
 const createButton = (text, container, x, y, onClick) => {
-  const button = createText(text, { ...textStyle, fill: "white" }, x, y);
+  const button = createText(text, { ...textStyle, fill: "black" }, x, y);
   button.interactive = true;
   button.cursor = "pointer";
   button.buttonMode = true;
@@ -42,7 +44,7 @@ const createConfirmButton = (container, x, y, onConfirm) => {
 const textStyle = {
   fontFamily: "Arial",
   fontSize: 24,
-  fill: 0xffffff,
+  fill: "black",
   align: "center",
 };
 
@@ -57,7 +59,7 @@ const loadTextures = async () => {
 
 const animation = (ring3) => {
   const fullRotation = 360; // 360 degrees for a full rotation
-  const totalSpins = 3; // Number of full spins before it starts slowing down
+  const totalSpins = 1; // Number of full spins before it starts slowing down
   const targetRotation = Math.random() * fullRotation; // Random end rotation for unpredictability
 
   // Set anchor to the center so the image rotates around its middle
@@ -68,9 +70,9 @@ const animation = (ring3) => {
   ring3.y = ring3.height / 2 + 30;
 
   gsap.to(ring3, {
-    rotation: `+=${totalSpins * fullRotation + targetRotation}`, // Spin for totalSpins and stop at random angle
-    duration: 5, // Adjust duration to your liking
-    ease: "power4.out", // Easing for a smooth deceleration
+    rotation: `+=${totalSpins * fullRotation + targetRotation}`,
+    duration: 6,
+    ease: "power4.out",
     onComplete: () => {
       console.log("Spin complete!");
       // Add any post-spin logic here, like determining the result
@@ -85,14 +87,17 @@ const PixiNewApp = () => {
   const balanceTextRef = useRef(null); // Reference to the balance text
 
   useEffect(() => {
-    const app = new PIXI.Application({
+    const app = new Application({
       background: "#fca5a5",
       resizeTo: window,
       autoDensity: true,
     });
 
-    const container = new PIXI.Container();
+    const container = new Container();
     app.stage.addChild(container);
+
+    const uiContainer = new Container();
+    app.stage.addChild(uiContainer);
 
     if (pixiRef.current) {
       pixiRef.current.appendChild(app.view);
@@ -110,6 +115,25 @@ const PixiNewApp = () => {
     window.addEventListener("resize", onResize);
     onResize(); // Initial resize adjustment
 
+    let gameGroundCover;
+    let Ring1;
+    let Ring2;
+    let Ring3;
+    let ringButtonMid;
+
+    Assets.load(bgCover).then((texture) => {
+      gameGroundCover = new Sprite(texture);
+
+      // Set sprite properties like position, size, etc.
+      // sprite.x = ;
+      // sprite.y = 10;
+      gameGroundCover.width = app.view?.width;
+      gameGroundCover.height = app.view?.height;
+
+      // Add the sprite to the container
+      container.addChild(gameGroundCover);
+    });
+
     // TEXT FOR BALANCE AND WALLET
     const balance = createText(
       "$ Balance",
@@ -124,13 +148,14 @@ const PixiNewApp = () => {
       10
     );
 
-    balanceTextRef.current = new PIXI.Text(
+    balanceTextRef.current = new Text(
       `$ ${currentWallet?.wallet || 0}`, // Use currentWallet if it exists, else 0
       textStyle
     );
     balanceTextRef.current.x = app.view.width / 2 - 150;
     balanceTextRef.current.y = 35;
-    container.addChild(balanceTextRef.current);
+
+    // container.addChild(balanceTextRef.current);
     // const balanceText = createText(
     //   `$ ${currentWallet.wallet ? currentWallet.wallet : 0}`,
     //   textStyle,
@@ -144,30 +169,34 @@ const PixiNewApp = () => {
       35
     );
 
-    container.addChild(balance);
-    container.addChild(wallet);
-    container.addChild(walletText);
-    // container.addChild(balanceText);
+    uiContainer.addChild(balance);
+    uiContainer.addChild(wallet);
+    uiContainer.addChild(balanceTextRef.current);
+    uiContainer.addChild(walletText);
+    // uiContainer.addChild(balanceText);
+
+    // container.addChild(balance);
+    // container.addChild(wallet);
 
     // CONTAINER FOR SELECTING AN ELEMENT
     const characters = ["A", "B", "C", "D", "E", "F", "G", "H"];
-    const elementContainer = new PIXI.Container();
+    const elementContainer = new Container();
     elementContainer.x = app.view.width / 2 - 150;
     elementContainer.y = 400;
     app.stage.addChild(elementContainer);
 
     // CONTAINER FOR BETING A AMOUNT ON ELEMENT
-    const betingContainer = new PIXI.Container();
+    const betingContainer = new Container();
     betingContainer.x = app.view.width / 2 - 150;
     betingContainer.y = 400;
     betingContainer.visible = false;
     app.stage.addChild(betingContainer);
 
     // CONTAINER FOR YOUR SPIN RESULT
-    const resultContainer = new PIXI.Container();
+    const resultContainer = new Container();
     app.stage.addChild(resultContainer);
 
-    const gameRingContainer = new PIXI.Container();
+    const gameRingContainer = new Container();
     app.stage.addChild(gameRingContainer);
     gameRingContainer.x = app.view.width / 2 - 120;
     gameRingContainer.y = 100;
@@ -199,13 +228,14 @@ const PixiNewApp = () => {
       const xPosition = index * 40 + 25;
       const button = createButton(char, elementContainer, xPosition, 50, () => {
         if (activeButton && activeButton !== button) {
-          activeButton.style.fill = "white";
+          activeButton.style.fill = "black";
         }
-        button.style.fill = "black";
+        button.style.fill = "green";
         confirmButton.visible = true;
         activeButton = button;
         // console.log(activeButton._text);
       });
+      button.style.fill = "black";
     });
 
     const betingHeading = createText(
@@ -216,12 +246,8 @@ const PixiNewApp = () => {
     );
     betingContainer.addChild(betingHeading);
 
-    let Ring1;
-    let Ring2;
-    let Ring3;
-
-    PIXI.Assets.load(ring1).then((texture) => {
-      Ring1 = new PIXI.Sprite(texture);
+    Assets.load(ring1).then((texture) => {
+      Ring1 = new Sprite(texture);
 
       // Set sprite properties like position, size, etc.
       // sprite.x = ;
@@ -233,8 +259,8 @@ const PixiNewApp = () => {
       gameRingContainer.addChild(Ring1);
     });
 
-    PIXI.Assets.load(ring2).then((texture) => {
-      Ring2 = new PIXI.Sprite(texture);
+    Assets.load(ring2).then((texture) => {
+      Ring2 = new Sprite(texture);
 
       // Set sprite properties like position, size, etc.
       // sprite.x = ;
@@ -246,8 +272,8 @@ const PixiNewApp = () => {
       gameRingContainer.addChild(Ring2);
     });
 
-    PIXI.Assets.load(ring3).then((texture) => {
-      Ring3 = new PIXI.Sprite(texture);
+    Assets.load(ring3).then((texture) => {
+      Ring3 = new Sprite(texture);
 
       // Set sprite properties like position, size, etc.
       Ring3.x = 30;
@@ -259,17 +285,17 @@ const PixiNewApp = () => {
       gameRingContainer.addChild(Ring3);
     });
 
-    const RingButton = PIXI.Assets.load(ringButton).then((texture) => {
-      const sprite = new PIXI.Sprite(texture);
+    Assets.load(ringButton).then((texture) => {
+      ringButtonMid = new Sprite(texture);
 
       // Set sprite properties like position, size, etc.
-      sprite.x = 99;
-      sprite.y = 99;
-      sprite.width = 80;
-      sprite.height = 80;
+      ringButtonMid.x = 99;
+      ringButtonMid.y = 99;
+      ringButtonMid.width = 80;
+      ringButtonMid.height = 80;
 
       // Add the sprite to the container
-      gameRingContainer.addChild(sprite);
+      gameRingContainer.addChild(ringButtonMid);
     });
 
     // const sprite = new Sprite(texture);
@@ -310,6 +336,8 @@ const PixiNewApp = () => {
       }
     );
 
+    let spinButtonResult = {};
+
     const spinButton = createButton(
       "Spin",
       betingContainer,
@@ -343,10 +371,7 @@ const PixiNewApp = () => {
           console.log("spinResult", spinResult);
 
           if (spinResult) {
-            // setCurrentWallet((pre) => ({
-            //   ...pre,
-            //   wallet: pre.wallet - spinBetAmount,
-            // }));
+            spinButtonResult = { ...spinResult };
           }
         });
         // }
