@@ -1,6 +1,11 @@
 import * as PIXI from "pixi.js";
 import React, { useEffect, useRef } from "react";
 import { useSocketContext } from "../context/socketContext";
+import ring1 from "../assets/ring/ring1.png";
+import ring2 from "../assets/ring/ring2.png";
+import ring3 from "../assets/ring/ring3.png";
+import ringButton from "../assets/ring/ringButton.png";
+import gsap from "gsap";
 
 const headingX = 165;
 
@@ -16,6 +21,7 @@ const createText = (text, style, x, y, anchor = 0.5) => {
 const createButton = (text, container, x, y, onClick) => {
   const button = createText(text, { ...textStyle, fill: "white" }, x, y);
   button.interactive = true;
+  button.cursor = "pointer";
   button.buttonMode = true;
   button.on("pointerdown", onClick);
   container.addChild(button);
@@ -26,6 +32,7 @@ const createConfirmButton = (container, x, y, onConfirm) => {
   const button = createText("Confirm", { ...textStyle, fill: "green" }, x, y);
   button.interactive = true;
   button.buttonMode = true;
+  button.cursor = "pointer";
   button.visible = false; // Initially hidden
   button.on("pointerdown", onConfirm);
   container.addChild(button);
@@ -37,6 +44,38 @@ const textStyle = {
   fontSize: 24,
   fill: 0xffffff,
   align: "center",
+};
+
+const loadTextures = async () => {
+  const ring1Texture = await PIXI.Assets.load(ring1);
+  const ring2Texture = await PIXI.Assets.load(ring2);
+  const ring3Texture = await PIXI.Assets.load(ring3);
+  const ringButtonTexture = await PIXI.Assets.load(ringButton);
+
+  return { ring1Texture, ring2Texture, ring3Texture, ringButtonTexture };
+};
+
+const animation = (ring3) => {
+  const fullRotation = 360; // 360 degrees for a full rotation
+  const totalSpins = 3; // Number of full spins before it starts slowing down
+  const targetRotation = Math.random() * fullRotation; // Random end rotation for unpredictability
+
+  // Set anchor to the center so the image rotates around its middle
+  ring3.anchor.set(0.5);
+
+  // Adjust position to ensure it's properly centered
+  ring3.x = ring3.width / 2 + 30;
+  ring3.y = ring3.height / 2 + 30;
+
+  gsap.to(ring3, {
+    rotation: `+=${totalSpins * fullRotation + targetRotation}`, // Spin for totalSpins and stop at random angle
+    duration: 5, // Adjust duration to your liking
+    ease: "power4.out", // Easing for a smooth deceleration
+    onComplete: () => {
+      console.log("Spin complete!");
+      // Add any post-spin logic here, like determining the result
+    },
+  });
 };
 
 const PixiNewApp = () => {
@@ -114,19 +153,24 @@ const PixiNewApp = () => {
     const characters = ["A", "B", "C", "D", "E", "F", "G", "H"];
     const elementContainer = new PIXI.Container();
     elementContainer.x = app.view.width / 2 - 150;
-    elementContainer.y = 200;
+    elementContainer.y = 400;
     app.stage.addChild(elementContainer);
 
     // CONTAINER FOR BETING A AMOUNT ON ELEMENT
     const betingContainer = new PIXI.Container();
     betingContainer.x = app.view.width / 2 - 150;
-    betingContainer.y = 200;
+    betingContainer.y = 400;
     betingContainer.visible = false;
     app.stage.addChild(betingContainer);
 
     // CONTAINER FOR YOUR SPIN RESULT
     const resultContainer = new PIXI.Container();
     app.stage.addChild(resultContainer);
+
+    const gameRingContainer = new PIXI.Container();
+    app.stage.addChild(gameRingContainer);
+    gameRingContainer.x = app.view.width / 2 - 120;
+    gameRingContainer.y = 100;
 
     let spinBetAmount = 0;
     let activeButton = null;
@@ -171,6 +215,64 @@ const PixiNewApp = () => {
       10
     );
     betingContainer.addChild(betingHeading);
+
+    let Ring1;
+    let Ring2;
+    let Ring3;
+
+    PIXI.Assets.load(ring1).then((texture) => {
+      Ring1 = new PIXI.Sprite(texture);
+
+      // Set sprite properties like position, size, etc.
+      // sprite.x = ;
+      // sprite.y = 10;
+      Ring1.width = 280;
+      Ring1.height = 280;
+
+      // Add the sprite to the container
+      gameRingContainer.addChild(Ring1);
+    });
+
+    PIXI.Assets.load(ring2).then((texture) => {
+      Ring2 = new PIXI.Sprite(texture);
+
+      // Set sprite properties like position, size, etc.
+      // sprite.x = ;
+      // sprite.y = 10;
+      Ring2.width = 280;
+      Ring2.height = 280;
+
+      // Add the sprite to the container
+      gameRingContainer.addChild(Ring2);
+    });
+
+    PIXI.Assets.load(ring3).then((texture) => {
+      Ring3 = new PIXI.Sprite(texture);
+
+      // Set sprite properties like position, size, etc.
+      Ring3.x = 30;
+      Ring3.y = 30;
+      Ring3.width = 220;
+      Ring3.height = 220;
+
+      // Add the sprite to the container
+      gameRingContainer.addChild(Ring3);
+    });
+
+    const RingButton = PIXI.Assets.load(ringButton).then((texture) => {
+      const sprite = new PIXI.Sprite(texture);
+
+      // Set sprite properties like position, size, etc.
+      sprite.x = 99;
+      sprite.y = 99;
+      sprite.width = 80;
+      sprite.height = 80;
+
+      // Add the sprite to the container
+      gameRingContainer.addChild(sprite);
+    });
+
+    // const sprite = new Sprite(texture);
 
     const betAmount = createText(
       `$ ${spinBetAmount}`,
@@ -234,6 +336,8 @@ const PixiNewApp = () => {
           ...pre,
           wallet: pre.wallet - spinBetAmount,
         }));
+
+        animation(Ring3);
 
         socket?.on("spinResult", (spinResult) => {
           console.log("spinResult", spinResult);
