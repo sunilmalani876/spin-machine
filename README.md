@@ -18,6 +18,7 @@ https://stackblitz.com/edit/vitejs-vite-jxkcix?file=src%2FApp.tsx
 
 
 <--
+"pixi.js": "^7.4.2",
 
 // const PixiNewApp = () => {
 //   // Create PIXI app instance
