@@ -89,8 +89,6 @@ const stopSpinning = (
               border: "6px solid #99f0d0",
               boxShadow:
                 "inset 6px 8px 2px rgb(86 139 219), 6px 8px 0px rgb(87 139 219)",
-              // background: "#56c0db",
-              // color: "white",
             },
           }
         );
@@ -154,16 +152,16 @@ const Home = () => {
       BoardText = new Sprite(Text);
       BoardText.width = 200;
       BoardText.height = 200;
-      BoardText.x = app.view?.width / 2 - BoardText.width / 2; // Center horizontally
-      BoardText.y = app.view?.height / 2 - BoardText.height / 2; // Center vertically
+      BoardText.x = app.view?.width / 2 - BoardText.width / 2;
+      BoardText.y = app.view?.height / 2 - BoardText.height / 2;
       container.addChild(BoardText);
 
       const BoardPin = await Assets.load(PinBar);
       Pin = new Sprite(BoardPin);
       Pin.width = 20;
       Pin.height = 35;
-      Pin.x = app.view?.width / 2 - Pin.width / 2; // Center horizontally
-      Pin.y = ring1?.height / 2 + 10; // Center vertically
+      Pin.x = app.view?.width / 2 - Pin.width / 2;
+      Pin.y = ring1?.height / 2 + 10;
       container.addChild(Pin);
 
       container.addChild(SpinButtonContainer);
@@ -172,16 +170,16 @@ const Home = () => {
       SpinButtonBase = new Sprite(spinButtonBase);
       SpinButtonBase.width = 110;
       SpinButtonBase.height = 85;
-      SpinButtonBase.x = app.view?.width / 2 - SpinButtonBase.width / 2; // Center horizontally
-      SpinButtonBase.y = app.view?.height / 2 + 145; // Center vertically
+      SpinButtonBase.x = app.view?.width / 2 - SpinButtonBase.width / 2;
+      SpinButtonBase.y = app.view?.height / 2 + 145;
       SpinButtonContainer.addChild(SpinButtonBase);
 
       const spinButtonTop = await Assets.load(ButtonTop);
       SpinButtonTop = new Sprite(spinButtonTop);
       SpinButtonTop.width = 90;
       SpinButtonTop.height = 60;
-      SpinButtonTop.x = app.view?.width / 2 - SpinButtonTop.width / 2; // Center horizontally
-      SpinButtonTop.y = app.view?.height / 2 + 145; // Center vertically
+      SpinButtonTop.x = app.view?.width / 2 - SpinButtonTop.width / 2;
+      SpinButtonTop.y = app.view?.height / 2 + 145;
       SpinButtonContainer.addChild(SpinButtonTop);
 
       const spinButtonPress = await Assets.load(ButtonPress);
@@ -189,8 +187,8 @@ const Home = () => {
       SpinButtonPressed.width = 90;
       SpinButtonPressed.height = 60;
       SpinButtonPressed.visible = false;
-      SpinButtonPressed.x = app.view?.width / 2 - SpinButtonPressed.width / 2; // Center horizontally
-      SpinButtonPressed.y = app.view?.height / 2 + 145; // Center vertically
+      SpinButtonPressed.x = app.view?.width / 2 - SpinButtonPressed.width / 2;
+      SpinButtonPressed.y = app.view?.height / 2 + 145;
       SpinButtonContainer.addChild(SpinButtonPressed);
 
       makeSpriteButton(SpinButtonTop, () => {
