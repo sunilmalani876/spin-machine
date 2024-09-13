@@ -1,8 +1,9 @@
 import React, { useEffect, useRef } from "react";
 import PixiNewApp from "./pixiNewApp";
+import Home from "../screen/home";
 
 const PixiCanvas = () => {
-  return <PixiNewApp />;
+  return <Home />;
   // const pixiCanvasRef = useRef(null);
   // useEffect(() => {
   //   const app = PixiNewApp();

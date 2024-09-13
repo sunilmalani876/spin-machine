@@ -16,11 +16,7 @@ export const SocketContextProvider = ({ children }) => {
   // console.log("currentWallet", currentWallet);
 
   useEffect(() => {
-    const socket = io(`${VITE_SOCKET_URL}`, {
-      query: {
-        userId: userId,
-      },
-    });
+    const socket = io(`${VITE_SOCKET_URL}`);
 
     if (socket) {
       socket.emit("walletRequest", {
@@ -28,6 +24,7 @@ export const SocketContextProvider = ({ children }) => {
       });
 
       socket.on("currentWallet", (data) => {
+        // console.log(data);
         if (data) {
           setCurrentWallet(data);
         }

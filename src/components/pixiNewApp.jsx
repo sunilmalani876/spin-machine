@@ -7,9 +7,11 @@ import ring1 from "../assets/ring/ring1.png";
 import ring2 from "../assets/ring/ring2.png";
 import ring3 from "../assets/ring/ring3.png";
 import board from "../assets/board.png";
+import PinBar from "../assets/pinBar.png";
 import boardText from "../assets/boardText.png";
 import ringButton from "../assets/ring/ringButton.png";
 import { useSocketContext } from "../context/socketContext";
+import { toast } from "sonner";
 
 const headingX = 165;
 
@@ -20,6 +22,17 @@ const createText = (text, style, x, y, anchor = 0.5) => {
   textObj.y = y;
   textObj.anchor.set(anchor);
   return textObj;
+};
+
+const elementDegrees = {
+  A: 0,
+  B: -45,
+  C: -90,
+  D: -135,
+  E: -180,
+  F: -225,
+  G: -270,
+  H: -315,
 };
 
 const createButton = (text, container, x, y, onClick) => {
@@ -62,7 +75,8 @@ const loadTextures = async () => {
 const animation = (ring3, x) => {
   const fullRotation = 360; // 360 degrees for a full rotation
   const totalSpins = 1; // Number of full spins before it starts slowing down
-  const targetRotation = Math.random() * fullRotation; // Random end rotation for unpredictability
+  const targetRotation = 3; // Random end rotation for unpredictability
+  // const targetRotation = Math.random() * fullRotation; // Random end rotation for unpredictability
 
   // Set anchor to the center so the image rotates around its middle
   ring3.anchor.set(0.5);
@@ -84,11 +98,73 @@ const animation = (ring3, x) => {
   });
 };
 
+const startSpinning = (ring, duration, x) => {
+  gsap.killTweensOf(ring); // Kill any ongoing tweens for this object
+
+  ring.anchor.set(0.5); // Ensure it's rotating around the center
+
+  // Reset the rotation before starting a new spin
+  ring.rotation = 0;
+
+  ring.x = x ? ring.width / 2 + 40 : ring.width / 2;
+  ring.y = x ? ring.height / 2 + 40 : ring.height / 2;
+
+  // Start the spinning animation
+  return gsap.to(ring, {
+    rotation: "+=360", // Full continuous spin
+    duration: duration, // Duration per full spin
+    repeat: -1, // Infinite loop for continuous spinning
+    ease: "none", // Linear ease for constant speed
+  });
+};
+
+// Helper to convert degrees to radians
+const degreesToRadians = (degrees) => degrees * (Math.PI / 180);
+
+// Function to stop the spinning with deceleration (always clockwise)
+
+const stopSpinning = (
+  ring,
+  targetRotationDegrees,
+  spinAnimation,
+  fullRotations = 2
+) => {
+  // Kill the infinite animation
+  if (spinAnimation) {
+    spinAnimation.kill();
+  }
+
+  // Convert target rotation to radians
+  const targetRotationRadians = degreesToRadians(targetRotationDegrees);
+
+  // Get the current rotation in radians
+  const currentRotationRadians = ring.rotation;
+
+  // Normalize current rotation to a 360-degree system (radians)
+  const normalizedCurrentRotation = currentRotationRadians % (2 * Math.PI);
+
+  // Calculate how much we need to rotate to reach the target, including full rotations
+  let deltaRotation = targetRotationRadians - normalizedCurrentRotation;
+
+  // Add the number of full rotations you want before stopping (fullRotations parameter allows flexibility)
+  const totalRotation = deltaRotation + 2 * Math.PI * fullRotations;
+
+  // Apply deceleration animation to stop the spin
+  gsap.to(ring, {
+    rotation: `+=${totalRotation}`, // Rotate by the calculated total including full rotations
+    duration: 3, // Deceleration duration
+    ease: "power4.out", // Smooth deceleration
+    onComplete: () => {
+      console.log("Spin stopped at the correct result!");
+    },
+  });
+};
+
 const PixiNewApp = () => {
   const { socket, currentWallet, setCurrentWallet, userId } =
     useSocketContext();
   const pixiRef = useRef(null);
-  const balanceTextRef = useRef(null); // Reference to the balance text
+  const balanceTextRef = useRef(null);
 
   useEffect(() => {
     const app = new Application({
@@ -122,13 +198,14 @@ const PixiNewApp = () => {
     let gameGroundCover;
     let Ring1;
     let Ring2;
-    let Ring3;
-    let ringButtonMid;
+    let Pin;
+
+    let ring1SpinAnimation;
+    let ring2SpinAnimation;
 
     Assets.load(bgCover).then((texture) => {
       gameGroundCover = new Sprite(texture);
 
-      // Set sprite properties like position, size, etc.
       // sprite.x = ;
       // sprite.y = 10;
       gameGroundCover.width = app.view?.width;
@@ -226,6 +303,7 @@ const PixiNewApp = () => {
       headingX,
       10
     );
+
     elementContainer.addChild(heading);
 
     characters.forEach((char, index) => {
@@ -250,69 +328,10 @@ const PixiNewApp = () => {
     );
     betingContainer.addChild(betingHeading);
 
-    // const button = new Button(
-    //   new Graphics().beginFill(0xffffff).drawRoundedRect(0, 0, 100, 50, 15)
-    // );
-    // betingContainer.addChild(button);
-
-    // Assets.load(ring1).then((texture) => {
-    //   Ring1 = new Sprite(texture);
-
-    //   // Set sprite properties like position, size, etc.
-    //   // sprite.x = ;
-    //   // sprite.y = 10;
-    //   Ring1.width = 280;
-    //   Ring1.height = 280;
-
-    //   // Add the sprite to the container
-    //   gameRingContainer.addChild(Ring1);
-    // });
-
-    // Assets.load(ring2).then((texture) => {
-    //   Ring2 = new Sprite(texture);
-
-    //   // Set sprite properties like position, size, etc.
-    //   // sprite.x = ;
-    //   // sprite.y = 10;
-    //   Ring2.width = 280;
-    //   Ring2.height = 280;
-
-    //   // Add the sprite to the container
-    //   gameRingContainer.addChild(Ring2);
-    // });
-
-    // Assets.load(ring3).then((texture) => {
-    //   Ring3 = new Sprite(texture);
-
-    //   // Set sprite properties like position, size, etc.
-    //   Ring3.x = 30;
-    //   Ring3.y = 30;
-    //   Ring3.width = 220;
-    //   Ring3.height = 220;
-
-    //   // Add the sprite to the container
-    //   gameRingContainer.addChild(Ring3);
-    // });
-
-    // Assets.load(ringButton).then((texture) => {
-    //   ringButtonMid = new Sprite(texture);
-
-    //   // Set sprite properties like position, size, etc.
-    //   ringButtonMid.x = 99;
-    //   ringButtonMid.y = 99;
-    //   ringButtonMid.width = 80;
-    //   ringButtonMid.height = 80;
-
-    //   // Add the sprite to the container
-    //   gameRingContainer.addChild(ringButtonMid);
-    // });
-
     Assets.load(board).then((texture) => {
       Ring1 = new Sprite(texture);
 
       // Set sprite properties like position, size, etc.
-      // sprite.x = ;
-      // sprite.y = 10;
       Ring1.width = 280;
       Ring1.height = 280;
 
@@ -320,13 +339,23 @@ const PixiNewApp = () => {
       gameRingContainer.addChild(Ring1);
     });
 
+    Assets.load(PinBar).then((texture) => {
+      Pin = new Sprite(texture);
+
+      // Set sprite properties like position, size, etc.
+      Pin.x = Ring1?.width / 2.15;
+      // sprite.y = 10;
+      Pin.width = 20;
+      Pin.height = 35;
+
+      // Add the sprite to the container
+      gameRingContainer.addChild(Pin);
+    });
+
     Assets.load(boardText).then((texture) => {
       Ring2 = new Sprite(texture);
 
       // Set sprite properties like position, size, etc.
-      // sprite.x = ;
-      // sprite.y = 10;
-      // Ring2.anchor = 0.5
       Ring2.x = Ring1?.width / 7;
       Ring2.y = Ring1?.height / 7;
       Ring2.width = 200;
@@ -390,6 +419,8 @@ const PixiNewApp = () => {
           bet: activeButton._text,
           userId,
         });
+        ring1SpinAnimation = startSpinning(Ring1, 1, false);
+        ring2SpinAnimation = startSpinning(Ring2, 1, true);
 
         // if (socket) {
         socket?.emit("spin", {
@@ -403,14 +434,27 @@ const PixiNewApp = () => {
           wallet: pre.wallet - spinBetAmount,
         }));
 
-        animation(Ring1, false);
-        animation(Ring2, true);
-
         socket?.on("spinResult", (spinResult) => {
           console.log("spinResult", spinResult);
 
           if (spinResult) {
             spinButtonResult = { ...spinResult };
+
+            // const targetRotation = 44;
+            const targetRotation = elementDegrees[spinResult.spinResult] || 0;
+
+            console.log(
+              "targetRotation",
+              elementDegrees[spinResult.spinResult]
+            );
+
+            // Stop the spinning with deceleration
+            stopSpinning(Ring1, targetRotation, ring1SpinAnimation, 6);
+            stopSpinning(Ring2, targetRotation, ring2SpinAnimation, 6);
+
+            // setTimeout(() => {
+            //   return toast.success("spin off");
+            // }, 2000);
           }
         });
         // }

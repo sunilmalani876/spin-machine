@@ -20,235 +20,66 @@ https://stackblitz.com/edit/vitejs-vite-jxkcix?file=src%2FApp.tsx
 <--
 "pixi.js": "^7.4.2",
 
-// const PixiNewApp = () => {
-//   // Create PIXI app instance
-//   const app = new PIXI.Application({
-//     background: "#fca5a5",
-//     resizeTo: window,
-//     autoDensity: true,
-//   });
 
-//   const container = new PIXI.Container();
-//   app.stage.addChild(container);
 
-//   const { socket } = useSocketContext(); // Access the socket
+previos assets
+ // const button = new Button(
+    //   new Graphics().beginFill(0xffffff).drawRoundedRect(0, 0, 100, 50, 15)
+    // );
+    // betingContainer.addChild(button);
 
-//   // Adjust background size when window resizes
-//   function adjustBackgroundSize(container, app) {
-//     // console.log("change");
-//     const bg = container.children.find(
-//       (child) =>
-//         child.texture && child.texture.baseTexture.resource.url === BaseBG
-//     );
-//     if (bg) {
-//       bg.width = app.view.width;
-//       bg.height = app.view.height;
-//     }
-//   }
+    // Assets.load(ring1).then((texture) => {
+    //   Ring1 = new Sprite(texture);
 
-//   // Handle window resize to adjust background size
-//   const onResize = () => {
-//     adjustBackgroundSize(container, app);
-//   };
+    //   // Set sprite properties like position, size, etc.
+    //   // sprite.x = ;
+    //   // sprite.y = 10;
+    //   Ring1.width = 280;
+    //   Ring1.height = 280;
 
-//   window.addEventListener("resize", onResize);
+    //   // Add the sprite to the container
+    //   gameRingContainer.addChild(Ring1);
+    // });
 
-//   // Initial resize adjustment
-//   onResize();
+    // Assets.load(ring2).then((texture) => {
+    //   Ring2 = new Sprite(texture);
 
-//   // TEXT FOR BALANCE AND WALLET
+    //   // Set sprite properties like position, size, etc.
+    //   // sprite.x = ;
+    //   // sprite.y = 10;
+    //   Ring2.width = 280;
+    //   Ring2.height = 280;
 
-//   // TEXT FOR BALANCE AND WALLET
-//   const textStyle = {
-//     fontFamily: "Arial",
-//     fontSize: 24,
-//     fill: 0xffffff, // White color
-//     align: "center",
-//   };
+    //   // Add the sprite to the container
+    //   gameRingContainer.addChild(Ring2);
+    // });
 
-//   const balance = new PIXI.Text("$ Balance", textStyle);
+    // Assets.load(ring3).then((texture) => {
+    //   Ring3 = new Sprite(texture);
 
-//   const wallet = new PIXI.Text("Bet Amount", textStyle);
+    //   // Set sprite properties like position, size, etc.
+    //   Ring3.x = 30;
+    //   Ring3.y = 30;
+    //   Ring3.width = 220;
+    //   Ring3.height = 220;
 
-//   const balanceText = new PIXI.Text("$ 234", textStyle);
+    //   // Add the sprite to the container
+    //   gameRingContainer.addChild(Ring3);
+    // });
 
-//   const walletText = new PIXI.Text("$ 0", textStyle);
+    // Assets.load(ringButton).then((texture) => {
+    //   ringButtonMid = new Sprite(texture);
 
-//   // Position the text in the center of the canvas
-//   //   balance.y = app.view.height / 2 - balance.height / 2;
+    //   // Set sprite properties like position, size, etc.
+    //   ringButtonMid.x = 99;
+    //   ringButtonMid.y = 99;
+    //   ringButtonMid.width = 80;
+    //   ringButtonMid.height = 80;
 
-//   // Add the text to the container
-//   balance.x = app.view.width / 2 - balance.width / 2 - 100;
-//   wallet.x = app.view.width / 2 - balance.width / 2 + 100;
-//   balanceText.x = app.view.width / 2 - balance.width / 2 - 70;
-//   balanceText.y = 35;
-//   walletText.x = app.view.width / 2 - balance.width / 2 + 130;
-//   walletText.y = 35;
+    //   // Add the sprite to the container
+    //   gameRingContainer.addChild(ringButtonMid);
+    // });
 
-//   container.addChild(balance);
-//   container.addChild(wallet);
-//   container.addChild(walletText);
-//   container.addChild(balanceText);
-
-//   // Container FOR SELECTING AN ELEMENT
-//   const characters = ["A", "B", "C", "D", "E", "F", "G", "H"];
-
-//   //
-//   // Container FOR SELECTING AN ELEMENT
-//   // SELECTING ELEMENT
-//   //
-//   const elementContainer = new PIXI.Container();
-//   elementContainer.x = app.view.width / 2 - 150;
-//   elementContainer.y = 200;
-//   app.stage.addChild(elementContainer);
-
-//   //
-//   // Container FOR SETTING A BET
-//   // SET BET AMOUNT ELEMENT
-//   //
-//   const betingContainer = new PIXI.Container();
-//   betingContainer.x = app.view.width / 2 - 150;
-//   betingContainer.y = 200; // Position it as needed
-//   betingContainer.visible = false; // Initially hidden
-//   app.stage.addChild(betingContainer);
-
-//   let spinBetAmount = 0;
-
-//   // This will store the currently active button
-//   let activeButton = null;
-//   let confirmButton = null; // This will store the confirm button
-
-//   // CREATE BUTTON FUNCTION
-//   const createButton = (text, container, x, y, onClick) => {
-//     const button = new PIXI.Text(text, { ...textStyle, fill: "white" });
-//     button.interactive = true;
-//     button.buttonMode = true;
-//     button.anchor.set(0.5);
-//     button.position.set(x, y);
-//     button.on("pointerdown", onClick);
-//     container.addChild(button);
-//     return button;
-//   };
-
-//   // CREATE CONFIRM_BUTTON FUNCTION
-//   const createConfirmButton = (container, x, y, onConfirm) => {
-//     const button = new PIXI.Text("Confirm", { ...textStyle, fill: "green" });
-//     button.interactive = true;
-//     button.buttonMode = true;
-//     button.anchor.set(0.5);
-//     button.position.set(x, y); // Position confirm button as desired
-//     button.visible = false; // Initially hidden
-//     button.on("pointerdown", onConfirm);
-//     container.addChild(button);
-//     return button;
-//   };
-
-//   const confirmX = 3 * 40 + 25;
-//   const confirmY = 100;
-
-//   // CONFIRM BUTTON AFTER SELECTING ELEMENT
-//   confirmButton = createConfirmButton(
-//     elementContainer,
-//     confirmX,
-//     confirmY,
-//     function () {
-//       // Hide all characters
-//       elementContainer.children.forEach((child) => {
-//         child.visible = false;
-//       });
-
-//       // Hide the confirm button
-//       confirmButton.visible = false;
-//       betingContainer.visible = true; // Make the betting container visible
-
-//       // Show bet amount component (you would implement your bet amount component here)
-//       // showBetAmountComponent();
-
-//       console.log("Closed");
-//     }
-//   );
-
-//   const heading = new PIXI.Text("Plaese, Select an element", textStyle);
-//   heading.x = 25;
-//   elementContainer.addChild(heading);
-//   // LOOP FOR CHARACTER ARRAY ELEMENT
-//   characters.map((char, index) => {
-//     const xPosition = index * 40 + 25;
-
-//     const button = createButton(
-//       char,
-//       elementContainer,
-//       xPosition,
-//       50,
-//       function () {
-//         console.log(char);
-
-//         // SET WHICH ONE IS ACTIVE BUTTONE
-//         if (activeButton && activeButton !== button) {
-//           activeButton.style.fill = "white";
-//         }
-
-//         button.style.fill = "black";
-//         confirmButton.visible = true;
-//         activeButton = button;
-//       }
-//     );
-//   });
-
-//   // BETTING SET-UP
-//   const betingHeading = new PIXI.Text("Plaese, Set bet amount...", textStyle);
-//   heading.x = 25;
-//   betingContainer.addChild(betingHeading);
-
-//   // INCREAMENT OR DECREASEMENT BET AMOUNT
-//   const increamentBet = createButton(
-//     "+ 10",
-//     betingContainer,
-//     betingContainer.x - 250,
-//     45,
-//     function () {
-//       console.log("Increment amount");
-//       // spinBetAmount = spinBetAmount + 10;
-//       spinBetAmount += 10;
-//       betAmount.text = `$ ${spinBetAmount}`;
-//     }
-//   );
-
-//   const betAmount = new PIXI.Text(`$ ${spinBetAmount}`, textStyle);
-//   betAmount.x = betingContainer.width / 2 - 20;
-//   betAmount.y = 35;
-
-//   betingContainer.addChild(betAmount);
-
-//   const decreamentBet = createButton(
-//     "- 10",
-//     betingContainer,
-//     app.view.width / 2 - 220,
-//     45,
-//     function () {
-//       if (spinBetAmount === 0) return;
-//       console.log("Decrement amount");
-//       spinBetAmount -= 10;
-//       betAmount.text = `$ ${spinBetAmount}`; // Update the bet amount text
-//     }
-//   );
-
-//   const SpinneButton = createButton(
-//     "Spin",
-//     betingContainer,
-//     app.view.width / 2 / 2 - 85,
-//     85,
-//     function () {
-//       if (spinBetAmount === 0) return;
-//       console.log("Decrement amount");
-//       spinBetAmount -= 10;
-//       betAmount.text = `$ ${spinBetAmount}`; // Update the bet amount text
-//     }
-//   );
-
-//   // Return the PIXI application instance
-//   return app;
-// };
 
 
  -->
